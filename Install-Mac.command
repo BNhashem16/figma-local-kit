@@ -59,14 +59,7 @@ if command -v claude >/dev/null 2>&1; then
 fi
 DESK="$HOME/Library/Application Support/Claude"
 if [ -d "$DESK" ]; then
-  "$NODE" -e '
-    const fs = require("fs"), f = process.argv[1];
-    let c = {}; try { c = JSON.parse(fs.readFileSync(f, "utf8")); } catch {}
-    if (fs.existsSync(f)) fs.copyFileSync(f, f + ".before-figma-local");
-    c.mcpServers = c.mcpServers || {};
-    c.mcpServers["figma-local"] = { command: process.argv[2], args: [process.argv[3]] };
-    fs.writeFileSync(f, JSON.stringify(c, null, 2));
-  ' "$DESK/claude_desktop_config.json" "$NODE" "$KIT/server/figma-local-mcp.mjs" && ok "Added to the Claude desktop app (restart the app to see it)"
+  "$NODE" "$KIT/installer/claude-desktop-config.js" add "$DESK/claude_desktop_config.json" "$NODE" "$KIT/server/figma-local-mcp.mjs" && ok "Added to the Claude desktop app (restart the app to see it)"
 fi
 
 # 5) Figma plugin

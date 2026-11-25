@@ -5,7 +5,7 @@ command -v claude >/dev/null 2>&1 && claude mcp remove figma-local -s user >/dev
 rm -rf "$HOME/.claude/skills/figma-local" && echo "Removed the figma-local skill"
 F="$HOME/Library/Application Support/Claude/claude_desktop_config.json"
 if [ -f "$F" ] && command -v node >/dev/null 2>&1; then
-  node -e 'const fs=require("fs"),f=process.argv[1];const c=JSON.parse(fs.readFileSync(f,"utf8"));if(c.mcpServers){delete c.mcpServers["figma-local"];}fs.writeFileSync(f,JSON.stringify(c,null,2));' "$F" && echo "Removed from the Claude desktop app"
+  node "$HOME/FigmaLocalKit/installer/claude-desktop-config.js" remove "$F" && echo "Removed from the Claude desktop app"
 fi
 echo
 echo "To remove the plugin from Figma: Plugins > Development > Manage plugins in development > Figma Local Bridge > Remove."
