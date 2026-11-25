@@ -1,5 +1,7 @@
 # Figma Local Bridge
 
+🎬 **فيديو الشرح / Video guide:** [docs/video/figma-local-kit-guide.mp4](docs/video/figma-local-kit-guide.mp4)
+
 <div dir="rtl">
 
 خلّي Claude يشتغل على ملفات Figma **من على جهازك**: يرتّب ويسمّي الشاشات، يطلع الشاشات المكررة، ويعمل تقرير عن أي صفحة.
