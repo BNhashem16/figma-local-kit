@@ -1,0 +1,4 @@
+logs/
+.bridge-token
+.DS_Store
+docs/video/build/

@@ -1,0 +1,53 @@
+<!doctype html>
+<html>
+<body style="font: 13px system-ui; margin: 12px">
+<div style="display:flex;align-items:center;gap:8px">
+  <span id="dot" style="width:12px;height:12px;border-radius:6px;background:#f5a623;display:inline-block"></span>
+  <b>Figma Local Bridge</b>
+</div>
+<div id="s" style="margin-top:6px">Connecting to Claude…</div>
+<div id="n" style="color:#666;margin-top:4px">0 commands</div>
+<div style="color:#999;margin-top:6px;font-size:11px">Keep this window open while Claude works.</div>
+<script>
+const BRIDGE = "http://localhost:3846";
+const s = document.getElementById("s"), n = document.getElementById("n"), dot = document.getElementById("dot");
+let count = 0, pending = null;
+const set = (color, text) => { dot.style.background = color; s.textContent = text; };
+
+onmessage = (e) => {
+  const msg = e.data.pluginMessage;
+  if (msg && pending && msg.cmdId === pending.cmdId) { pending.resolve(msg); pending = null; }
+};
+
+function runInPlugin(cmd) {
+  return new Promise((resolve) => {
+    pending = { cmdId: cmd.id, resolve };
+    parent.postMessage({ pluginMessage: { cmdId: cmd.id, op: cmd.op, args: cmd.args } }, "*");
+  });
+}
+
+async function loop() {
+  while (true) {
+    try {
+      const r = await fetch(BRIDGE + "/plugin/next");
+      if (r.status === 204) { set("#2ecc71", "Connected ✓  Waiting for Claude."); continue; }
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      const cmd = await r.json();
+      set("#3498db", "Working: " + cmd.op + " …");
+      const res = await runInPlugin(cmd);
+      await fetch(BRIDGE + "/plugin/result", {
+        method: "POST",
+        headers: { "Content-Type": "text/plain" },
+        body: JSON.stringify({ id: cmd.id, ok: res.ok, result: res.result, error: res.error }),
+      });
+      n.textContent = (++count) + " commands";
+    } catch (err) {
+      set("#e74c3c", "Claude is not open yet. Open Claude, then wait…");
+      await new Promise((r) => setTimeout(r, 2000));
+    }
+  }
+}
+loop();
+</script>
+</body>
+</html>
